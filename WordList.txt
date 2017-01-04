@@ -1,12 +1,12 @@
-+achievement
- +acid
- +action
- +adventure
- +allspark
- +ammo
- +arpg
- +assassin
- +asteroid
+achievement
+acid
+action
+adventure
+allspark
+ammo
+arpg
+assassin
+asteroid
  +autosave
  +avatar
  +avenger

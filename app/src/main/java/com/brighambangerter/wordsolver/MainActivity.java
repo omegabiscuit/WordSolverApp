@@ -1,5 +1,7 @@
 package com.brighambangerter.wordsolver;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -14,7 +16,8 @@ import java.io.File;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
-    public static String Solver(String string) {
+
+    public String Solver(String string) {
 
 
 
@@ -26,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
             return "No word can be created";
         }
         else{
-            return Solution;
+            return Solution + " " + Calculator(Solution);
             //System.out.println("The highest value word you can make is:" + Solution + " " + "with a value of " + Calculator(Solution));
         }
     }
@@ -52,24 +55,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public static ArrayList Dictionary(){
+
+    public ArrayList Dictionary(){
+        Context context = this;
+       InputStream is = context.getResources().openRawResource(R.raw.wordlist);
+
         ArrayList Dictionary = new ArrayList();
-        File WordList = new File("WordList.txt");
+        //File WordList = new File("WordList.txt");
         String[] splitStrings;
-        try {
 
-            Scanner line = new Scanner(WordList);
+        Scanner line = new Scanner(is);
 
-            while (line.hasNextLine()) {
-                String i = line.nextLine();
-                splitStrings = i.split("");
-                Dictionary.add(splitStrings);
-            }
-            line.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-
+        while (line.hasNextLine()) {
+            String i = line.nextLine();
+            splitStrings = i.split("");
+            Dictionary.add(splitStrings);
         }
+        line.close();
         return Dictionary;
     }
 
