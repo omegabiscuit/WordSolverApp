@@ -2,44 +2,53 @@ package com.brighambangerter.wordsolver;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.EditText;
+import android.view.View;
+import android.content.Intent;
+
 
 import java.util.*;
 import java.io.*;
 import java.io.File;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class MainActivity extends AppCompatActivity {
-    public static void Solver(String[] args) {
+    public static String Solver(String string) {
 
 
 
-        ArrayList myHand = LetterList();//get list of letters from user
+        ArrayList myHand = LetterList(string);//get list of letters from user
         ArrayList myDictionary = Dictionary();//get words for text file
         String Solution = DeScramble(myDictionary, myHand);//find matches between user input and text file, and output highest value word
 
         if(Solution.isEmpty()){
-            System.out.println("No word can be created");
+            return "No word can be created";
         }
         else{
-            System.out.println("The highest value word you can make is:" + Solution + " " + "with a value of " + Calculator(Solution));
+            return Solution;
+            //System.out.println("The highest value word you can make is:" + Solution + " " + "with a value of " + Calculator(Solution));
         }
     }
 
 
-    public static ArrayList LetterList(){
-        ArrayList myHand = new ArrayList();
+    public static ArrayList LetterList(String string){
+        ArrayList Hand = new ArrayList();
         Scanner scan = new Scanner(System.in);
-        System.out.println("Enter all of the desired letter. Press ENTER when finished.");
-        String s = scan.nextLine();
-        s = s.replaceAll("\\d+", ""); //remove numbers
-        s = s.toLowerCase(); //convert all to lowercase
-        String[] splitStrings = s.split("");
+
+        //System.out.println("Enter all of the desired letter. Press ENTER when finished.");
+       // String s = scan.nextLine();
+
+        string = string.replaceAll("\\d+", ""); //remove numbers
+        string = string.toLowerCase(); //convert all to lowercase
+        String[] splitStrings = string.split("");
         for (int i = 0; i < splitStrings.length; i++) {
             if (splitStrings[i].equals(",") || splitStrings[i].equals(" ")) { //remove objects other than letters
             } else {
-                myHand.add(splitStrings[i]);
+                Hand.add(splitStrings[i]);
             }
         }
-        return myHand;
+        return Hand;
     }
 
 
@@ -137,11 +146,24 @@ public class MainActivity extends AppCompatActivity {
         }
         return TrueAnswer;
     }
-
+    public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    /**Called when the user clicks the Send button */
+    public void sendMessage(View view){
+
+        EditText editText = (EditText) findViewById(R.id.edit_message);
+        String message = editText.getText().toString();
+        String mySolution = Solver(message);
+
+        Intent intent = new Intent(this, DisplayMessageActivity.class);
+        intent.putExtra(EXTRA_MESSAGE, mySolution);
+        startActivity(intent);
+        //use solver function
     }
 }
 
