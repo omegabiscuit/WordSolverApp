@@ -1,7 +1,6 @@
 package com.brighambangerter.wordsolver;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -9,9 +8,13 @@ import android.view.View;
 import android.content.Intent;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+
 import java.util.*;
 import java.io.*;
-import java.io.File;
+
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -54,6 +57,19 @@ public class MainActivity extends AppCompatActivity {
         return Hand;
     }
 
+
+    public ArrayList DictionaryAPI(ArrayList hand){
+        for(int i=0; i<hand.size();i++){
+            
+        }
+
+
+        Gson gson = new GsonBuilder().create();
+        String id = null;
+        id = gson.fromJson()
+
+
+    }
 
 
     public ArrayList Dictionary(){
@@ -115,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static String DeScramble(ArrayList list, ArrayList list2){
+
+        Gson gson = new GsonBuilder().create();
+        String id = null;
+
+
         String PossibleAnswer="";
         String TrueAnswer = "";
         ArrayList CheckedLetters = new ArrayList();
