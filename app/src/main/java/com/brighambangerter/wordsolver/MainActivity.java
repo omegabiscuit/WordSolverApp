@@ -20,14 +20,17 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
-    public String Solver(String string) {
-
-
-
+    public ArrayList Solver(String string) {
+        ArrayList myPossibilities = new ArrayList<>();//array of permutations seperated in characters
+        ArrayList myFinalHand = new ArrayList();//array of permutations in seperated in strings
         ArrayList myHand = LetterList(string);//get list of letters from user
-        ArrayList myDictionary = Dictionary();//get words for text file
-        String Solution = DeScramble(myDictionary, myHand);//find matches between user input and text file, and output highest value word
+        Permutation(myHand, myPossibilities, 0);//find every permutation of input letters
+        myFinalHand = Merger(myPossibilities); //convert words that were broken down to characters to an array of strings
+        //ArrayList myDictionary = Dictionary();//get words for text file
+        //String Solution = DeScramble(myDictionary, myFinalHand);//find matches between user input and text file, and output highest value word
 
+        //ArrayList Solution = DictionaryAPI(myPossibilities, 0);
+        /*
         if(Solution.isEmpty()){
             return "No word can be created";
         }
@@ -35,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
             return Solution + " " + Calculator(Solution);
             //System.out.println("The highest value word you can make is:" + Solution + " " + "with a value of " + Calculator(Solution));
         }
+        */
+        return myFinalHand;
+
     }
 
 
@@ -47,32 +53,75 @@ public class MainActivity extends AppCompatActivity {
 
         string = string.replaceAll("\\d+", ""); //remove numbers
         string = string.toLowerCase(); //convert all to lowercase
-        String[] splitStrings = string.split("");
-        for (int i = 0; i < splitStrings.length; i++) {
-            if (splitStrings[i].equals(",") || splitStrings[i].equals(" ")) { //remove objects other than letters
-            } else {
+        String[] splitStrings = string.split("(?!^)");
+        for (int i=0 ; i < splitStrings.length ; i++) {
+            if(i==0){
+                break;
+            }
+            if (splitStrings[i].equals(",")|| splitStrings[i].equals(' ')) { //remove objects other than letters
+            }
+            else {
                 Hand.add(splitStrings[i]);
             }
         }
+        Hand.remove(1);
         return Hand;
     }
 
-
-    public ArrayList DictionaryAPI(ArrayList hand){
-        for(int i=0; i<hand.size();i++){
-            
+    public static void Permutation(ArrayList hand, ArrayList possibilities, int start) {
+        for (int i = 0; i < hand.size()-1; i++) {
+            ArrayList tempArray = new ArrayList(hand);
+            Object tempValue = tempArray.get(start);
+            tempArray.set(start, tempArray.get(i));
+            tempArray.set(i,tempValue);
+            if(possibilities.indexOf(tempArray) == -1){
+                possibilities.add(tempArray);
+            }
+            if(start <hand.size()-1){
+                Permutation(tempArray, possibilities, start + 1);
+            }
         }
+    }
 
+    public static ArrayList Merger(ArrayList list){
+        ArrayList mergedHand = new ArrayList(); //array of every permutation in seperate strings
+        for(int i=0; i < list.size(); i++){
+            ArrayList tempArray = (ArrayList) list.get(i);
+            String tempString = new String();
+            for(int j=0; j < tempArray.size(); j++){
+                tempString += tempArray.get(j);
+            }
+            mergedHand.add(tempString);
+        }
+        return mergedHand;
+    }
 
+/*
+    public ArrayList DictionaryAPI(ArrayList hand, ArrayList possibilities, int iter) {
+        for (int i = iter; i < hand.size(); i++) {
+            ArrayList tempArray = hand;
+            Object tempValue = tempArray.get(iter);
+            tempArray.set(iter, tempArray.get(i + iter));
+            tempArray.set(i + iter, tempValue);
+            possibilities.add(tempArray);
+            if (iter < hand.size() - 1) {
+                DictionaryAPI(hand, possibilities, iter + 1);
+            }
+        }
+        return possibilities;
+    }
+*/
+
+/*
         Gson gson = new GsonBuilder().create();
         String id = null;
         id = gson.fromJson()
 
 
     }
+*/
 
-
-    public ArrayList Dictionary(){
+    public ArrayList Dictionary(){ //function to test input with WordList.txt
         Context context = this;
        InputStream is = context.getResources().openRawResource(R.raw.wordlist);
 
@@ -85,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         while (line.hasNextLine()) {
             String i = line.nextLine();
             splitStrings = i.split("");
-            Dictionary.add(splitStrings);
+            Dictionary.add(i);
         }
         line.close();
         return Dictionary;
@@ -128,7 +177,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+/*
+    public static String DeScramble(ArrayList list, ArrayList list2){
 
+
+        String PossibleAnswer="";
+        String TrueAnswer = "";
+        ArrayList CheckedLetters = new ArrayList();
+        int TrueValue = 0;
+        for(int i=0; i < list2.size();i++){
+            //String[] word = (String []) list.get(i);
+            PossibleAnswer="";
+            if(list.indexOf(list2.get(i)) != -1){
+                for(int j=0; j<list2.get(i).size();j++){
+                    PossibleAnswer+=word[j];
+                }
+                if(Calculator(PossibleAnswer) > TrueValue){
+                    TrueAnswer = PossibleAnswer;
+                    TrueValue = Calculator(PossibleAnswer);
+                }
+
+            }
+        }
+        return TrueAnswer;
+    }
+*/
 
     public static String DeScramble(ArrayList list, ArrayList list2){
 
@@ -169,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return TrueAnswer;
     }
+
     public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +255,8 @@ public class MainActivity extends AppCompatActivity {
 
         EditText editText = (EditText) findViewById(R.id.edit_message);
         String message = editText.getText().toString();
-        String mySolution = Solver(message);
+        ArrayList mySolution = Solver(message);
+
 
         Intent intent = new Intent(this, DisplayMessageActivity.class);
         intent.putExtra(EXTRA_MESSAGE, mySolution);
