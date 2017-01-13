@@ -20,14 +20,15 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
-    public ArrayList Solver(String string) {
+    public String Solver(String string) {
         ArrayList myPossibilities = new ArrayList<>();//array of permutations seperated in characters
         ArrayList myFinalHand = new ArrayList();//array of permutations in seperated in strings
         ArrayList myHand = LetterList(string);//get list of letters from user
+        myPossibilities.add(myHand);
         Permutation(myHand, myPossibilities, 0);//find every permutation of input letters
         myFinalHand = Merger(myPossibilities); //convert words that were broken down to characters to an array of strings
-        //ArrayList myDictionary = Dictionary();//get words for text file
-        //String Solution = DeScramble(myDictionary, myFinalHand);//find matches between user input and text file, and output highest value word
+        ArrayList myDictionary = Dictionary();//get words for text file
+        String Solution = DeScramble(myFinalHand, myDictionary);//find matches between user input and text file, and output highest value word
 
         //ArrayList Solution = DictionaryAPI(myPossibilities, 0);
         /*
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             //System.out.println("The highest value word you can make is:" + Solution + " " + "with a value of " + Calculator(Solution));
         }
         */
-        return myFinalHand;
+        return Solution;
 
     }
 
@@ -61,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 Hand.add(splitStrings[i]);
             }
         }
-        Hand.remove(1);
         return Hand;
     }
 
@@ -211,30 +211,13 @@ public class MainActivity extends AppCompatActivity {
         ArrayList CheckedLetters = new ArrayList();
         int TrueValue = 0;
         for (int i=0; i<list.size();i++){
-            String[] word = (String []) list.get(i);
-            for(int j=0; j< word.length;j++) {
-                if (list2.contains(word[j])) {
-                    list2.remove(word[j]);//remove so letter is not accounted for more than once
-                    PossibleAnswer+=word[j];
-                    CheckedLetters.add(word[j]);
-                }
-                else {
-                    PossibleAnswer = "";
-                    list2.addAll(CheckedLetters);
-                    break;
+            String word = (String) list.get(i);
+            if (list2.contains(word)) {
+                if (Calculator(word) > TrueValue) {
+                    TrueAnswer = word;
+                    TrueValue = Calculator(word);
                 }
             }
-            if (PossibleAnswer != ""){ //stop if an answer is found
-                int PossibleValue = Calculator(PossibleAnswer);
-                if(PossibleValue > TrueValue){
-                    TrueValue = PossibleValue;
-                    TrueAnswer = PossibleAnswer;
-                }
-                PossibleAnswer = "";
-                list2.addAll(CheckedLetters);
-                CheckedLetters.clear();
-            }
-
 
         }
         return TrueAnswer;
@@ -252,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
         EditText editText = (EditText) findViewById(R.id.edit_message);
         String message = editText.getText().toString();
-        ArrayList mySolution = Solver(message);
+        String mySolution = Solver(message);
 
 
         Intent intent = new Intent(this, DisplayMessageActivity.class);
