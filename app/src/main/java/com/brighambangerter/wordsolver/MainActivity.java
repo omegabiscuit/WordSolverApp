@@ -55,9 +55,6 @@ public class MainActivity extends AppCompatActivity {
         string = string.toLowerCase(); //convert all to lowercase
         String[] splitStrings = string.split("(?!^)");
         for (int i=0 ; i < splitStrings.length ; i++) {
-            if(i==0){
-                break;
-            }
             if (splitStrings[i].equals(",")|| splitStrings[i].equals(' ')) { //remove objects other than letters
             }
             else {
