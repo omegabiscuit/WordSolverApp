@@ -9,6 +9,7 @@ import android.content.Intent;
 
 
 import java.io.*;
+import java.util.ArrayList;
 
 
 import io.reactivex.SingleObserver;
@@ -27,10 +28,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity {
-    ScrabbleHelper myscrabblehelper = new ScrabbleHelper();
-
-    public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+    public final static String EXTRA_MESSAGE = "WordSolver";
     Oxford oxford;
+    Anagramica anagramica;
     View root;
 
     @Override
@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ScrabbleHelper.init();
-        root = findViewById(R.id.root);
-
         /*oxford.lookupword("fish").enqueue(new Callback<WordResponse>() {
             @Override
             public void onResponse(Call<WordResponse> call, retrofit2.Response<WordResponse> response) {
@@ -67,6 +65,23 @@ public class MainActivity extends AppCompatActivity {
     public void sendMessage(View view) {
         EditText editText = (EditText) findViewById(R.id.edit_message);
         String message = editText.getText().toString();
+        anagramica.findBest(message).enqueue(new Callback<WordResponse>() {
+            @Override
+            public void onResponse(Call<WordResponse> call, retrofit2.Response<WordResponse> response) {
+                ArrayList<String> mypossibilities = new ArrayList<>(response.body().getBest());
+                String bestword = ScrabbleHelper.solve(mypossibilities);
+                Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+                intent.putExtra(EXTRA_MESSAGE, bestword);
+                startActivity(intent);
+            }
+            @Override
+            public void onFailure(Call<WordResponse> call, Throwable t) {
+                Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+                intent.putExtra(EXTRA_MESSAGE, "No Words Found");
+                startActivity(intent);
+            }
+        });
+        /*
         ScrabbleHelper.solve(message)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
@@ -88,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
-
+        */
         //use solver function
     }
 }

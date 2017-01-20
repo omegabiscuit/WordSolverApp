@@ -1,6 +1,7 @@
 package com.brighambangerter.wordsolver;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,6 +20,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -28,30 +31,83 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ScrabbleHelper {
     static Oxford oxford;
-
+    static Anagramica anagramica;
     static void init() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-                        Request request = chain.request().newBuilder()
-                                .addHeader("app_id", "7ddb00d8")
-                                .addHeader("app_key", "9b38e8c1685a64d7b05dfb07c0666559")
-                                .build();
-                        return chain.proceed(request);
-                    }
-                })
-                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .build();
+        OkHttpClient client = new OkHttpClient.Builder().build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://od-api.oxforddictionaries.com/api/v1/")
+                .baseUrl("http://www.anagramica.com/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        oxford = retrofit.create(Oxford.class);
+        anagramica = retrofit.create(Anagramica.class);
     }
 
-    static Single<String> solve(String string) {
+    /*
+        static void init() {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(new Interceptor() {
+                        @Override
+                        public Response intercept(Chain chain) throws IOException {
+                            Request request = chain.request().newBuilder()
+                                    .addHeader("app_id", "7ddb00d8")
+                                    .addHeader("app_key", "9b38e8c1685a64d7b05dfb07c0666559")
+                                    .build();
+                            return chain.proceed(request);
+                        }
+                    })
+                    .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .build();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("https://od-api.oxforddictionaries.com/api/v1/")
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            oxford = retrofit.create(Oxford.class);
+        }
+    */
+    static String solve(ArrayList<String> mypossibilities) {
+        String solution = "";
+        String possiblesolution = "";
+        int solvalue = 0;
+        int possiblesolvalue = 0;
+        for (String word : mypossibilities) {
+            possiblesolvalue = Calculator(word);
+            if (possiblesolvalue > solvalue) {
+                solvalue = possiblesolvalue;
+                solution = word;
+            }
+        }
+        return solution;
+    }
+        /*
+        anagramica.findBest(string).enqueue(new Callback<WordResponse>() {
+            @Override
+            public void onResponse(Call<WordResponse> call, retrofit2.Response<WordResponse> response) {
+                ArrayList<String> mypossibilities = new ArrayList<>(response.body().getBest());
+                String solution = "";
+                String possiblesolution = "";
+                int solvalue = 0;
+                int possiblesolvalue = 0;
+                for (String word : mypossibilities) {
+                    possiblesolvalue = Calculator(word);
+                    if (possiblesolvalue > solvalue) {
+                        solvalue = possiblesolvalue;
+                        solution = word;
+                    }
+                }
+            }
+
+        @Override
+        public void onFailure (Call < WordResponse > call, Throwable t){
+            solution = "No Words Found";
+        }
+    }
+
+    );
+    return solution;
+    */
+
+        /*
         ArrayList<ArrayList<String>> myPossibilities = new ArrayList<>();//array of permutations seperated in characters
         ArrayList<String> myHand = LetterList(string);//get list of letters from user
         myPossibilities.add(myHand);
@@ -90,10 +146,7 @@ public class ScrabbleHelper {
             //System.out.println("The highest value word you can make is:" + Solution + " " + "with a value of " + Calculator(Solution));
         }
         */
-        //return Solution;
-
-
-    }
+    //return Solution;
 
 
     static ArrayList<String> LetterList(String string) {
